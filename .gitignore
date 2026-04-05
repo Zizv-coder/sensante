@@ -1,0 +1,13 @@
+#Environnement python
+__pycache__ /
+*. pyc
+venv /
+. env
+# Modele ML ( trop gros pour GitHub )
+models /*. pkl
+# Fichiers OS
+. DS_Store
+Thumbs . db
+# IDE
+. vscode /
+. idea /
