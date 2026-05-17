@@ -135,3 +135,139 @@ for classe, proba in zip(model_loaded.classes_, probas):
     nom = le_diagnostic_loaded.inverse_transform([classe])[0]  # ✅ décode l'entier
     bar = '#' * int(proba * 30)
     print(f"  {nom:12s} : {proba:.1%} {bar}")  # ✅ :12s sur string, pas int
+
+
+# --- Nouveau patient 1 sans symptome---
+nouveau_patient = {
+    'age': 18, 
+    'sexe': 'M',
+    'temperature': 37.5,
+    'tension_sys': 110,
+    'toux': False, 
+    'fatigue': False,
+    'maux_tete': False, 
+    'region': 'Dakar'
+}
+
+sexe_enc = le_sexe_loaded.transform([nouveau_patient['sexe']])[0]
+region_enc = le_region_loaded.transform([nouveau_patient['region']])[0]
+
+features = [[
+    nouveau_patient['age'], 
+    sexe_enc, 
+    nouveau_patient['temperature'],
+    nouveau_patient['tension_sys'], 
+    int(nouveau_patient['toux']),
+    int(nouveau_patient['fatigue']), 
+    int(nouveau_patient['maux_tete']),
+    region_enc
+]]
+
+# ✅ DataFrame pour éviter le UserWarning
+features_df = pd.DataFrame(features, columns=feature_cols_loaded)
+
+diagnostic_code = model_loaded.predict(features_df)[0]
+diagnostic_nom = le_diagnostic_loaded.inverse_transform([diagnostic_code])[0]  # ✅ décodé
+probas = model_loaded.predict_proba(features_df)[0]
+proba_max = probas.max()
+
+print(f"\n--- Resultat du pre-diagnostic ---")
+print(f"Patient : {nouveau_patient['sexe']}, {nouveau_patient['age']} ans")
+print(f"Diagnostic : {diagnostic_nom}")   # ✅ nom, pas entier
+print(f"Probabilite : {proba_max:.1%}")
+
+print(f"\nProbabilites par classe :")
+for classe, proba in zip(model_loaded.classes_, probas):
+    nom = le_diagnostic_loaded.inverse_transform([classe])[0]  # ✅ décode l'entier
+    bar = '#' * int(proba * 30)
+    print(f"  {nom:12s} : {proba:.1%} {bar}")  # ✅ :12s sur string, pas int
+
+    # --- Nouveau patient 2 avec une forte fievre---
+nouveau_patient = {
+    'age': 30, 
+    'sexe': 'M',
+    'temperature': 40,
+    'tension_sys': 110,
+    'toux': False, 
+    'fatigue': False,
+    'maux_tete': False, 
+    'region': 'Dakar'
+}
+
+sexe_enc = le_sexe_loaded.transform([nouveau_patient['sexe']])[0]
+region_enc = le_region_loaded.transform([nouveau_patient['region']])[0]
+
+features = [[
+    nouveau_patient['age'], 
+    sexe_enc, 
+    nouveau_patient['temperature'],
+    nouveau_patient['tension_sys'], 
+    int(nouveau_patient['toux']),
+    int(nouveau_patient['fatigue']), 
+    int(nouveau_patient['maux_tete']),
+    region_enc
+]]
+
+# ✅ DataFrame pour éviter le UserWarning
+features_df = pd.DataFrame(features, columns=feature_cols_loaded)
+
+diagnostic_code = model_loaded.predict(features_df)[0]
+diagnostic_nom = le_diagnostic_loaded.inverse_transform([diagnostic_code])[0]  # ✅ décodé
+probas = model_loaded.predict_proba(features_df)[0]
+proba_max = probas.max()
+
+print(f"\n--- Resultat du pre-diagnostic ---")
+print(f"Patient : {nouveau_patient['sexe']}, {nouveau_patient['age']} ans")
+print(f"Diagnostic : {diagnostic_nom}")   # ✅ nom, pas entier
+print(f"Probabilite : {proba_max:.1%}")
+
+print(f"\nProbabilites par classe :")
+for classe, proba in zip(model_loaded.classes_, probas):
+    nom = le_diagnostic_loaded.inverse_transform([classe])[0]  # ✅ décode l'entier
+    bar = '#' * int(proba * 30)
+    print(f"  {nom:12s} : {proba:.1%} {bar}")  # ✅ :12s sur string, pas int
+
+    # --- Nouveau patient 3 ---
+nouveau_patient = {
+    'age': 69, 
+    'sexe': 'M',
+    'temperature': 37.5,
+    'tension_sys': 110,
+    'toux': True, 
+    'fatigue': False,
+    'maux_tete': False, 
+    'region': 'Dakar'
+}
+
+sexe_enc = le_sexe_loaded.transform([nouveau_patient['sexe']])[0]
+region_enc = le_region_loaded.transform([nouveau_patient['region']])[0]
+
+features = [[
+    nouveau_patient['age'], 
+    sexe_enc, 
+    nouveau_patient['temperature'],
+    nouveau_patient['tension_sys'], 
+    int(nouveau_patient['toux']),
+    int(nouveau_patient['fatigue']), 
+    int(nouveau_patient['maux_tete']),
+    region_enc
+]]
+
+# ✅ DataFrame pour éviter le UserWarning
+features_df = pd.DataFrame(features, columns=feature_cols_loaded)
+
+diagnostic_code = model_loaded.predict(features_df)[0]
+diagnostic_nom = le_diagnostic_loaded.inverse_transform([diagnostic_code])[0]  # ✅ décodé
+probas = model_loaded.predict_proba(features_df)[0]
+proba_max = probas.max()
+
+print(f"\n--- Resultat du pre-diagnostic ---")
+print(f"Patient : {nouveau_patient['sexe']}, {nouveau_patient['age']} ans")
+print(f"Diagnostic : {diagnostic_nom}")   # ✅ nom, pas entier
+print(f"Probabilite : {proba_max:.1%}")
+
+print(f"\nProbabilites par classe :")
+for classe, proba in zip(model_loaded.classes_, probas):
+    nom = le_diagnostic_loaded.inverse_transform([classe])[0]  # ✅ décode l'entier
+    bar = '#' * int(proba * 30)
+    print(f"  {nom:12s} : {proba:.1%} {bar}")  # ✅ :12s sur string, pas int
