@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenSante - Pre-diagnostic</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white py-4 shadow-lg">
+        <div class="max-w-4xl mx-auto px-4">
+            <h1 class="text-2xl font-bold">SenSante</h1>
+            <p class="text-blue-100 text-sm">
+                Assistant pre-diagnostic medical
+            </p>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Colonne gauche : formulaire -->
+            <div id="form-section" class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    Symptomes du patient
+                </h2>
+
+                <!-- Age -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                    <input type="number" id="age"
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Ex: 28" min="0" max="120">
+                </div>
+
+                <!-- Sexe -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sexe</label>
+                    <select id="sexe" class="w-full border border-gray-300 rounded-lg p-2">
+                        <option value="F">Feminin</option>
+                        <option value="M">Masculin</option>
+                    </select>
+                </div>
+
+                <!-- Temperature -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Temperature (C)
+                    </label>
+                    <input type="number" id="temperature" step="0.1"
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Ex: 38.5" min="35" max="42">
+                </div>
+
+                <!-- Tension -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Tension systolique
+                    </label>
+                    <input type="number" id="tension_sys"
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder="Ex: 120" min="60" max="250">
+                </div>
+
+                <!-- Symptomes (checkboxes) -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Symptomes</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="toux" class="rounded text-blue-600 mr-2">
+                            <span class="text-gray-700">Toux</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="fatigue" class="rounded text-blue-600 mr-2">
+                            <span class="text-gray-700">Fatigue</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="maux_tete" class="rounded text-blue-600 mr-2">
+                            <span class="text-gray-700">Maux de tete</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Region -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                    <select id="region" class="w-full border border-gray-300 rounded-lg p-2">
+                        <option value="Dakar">Dakar</option>
+                        <option value="Thies">Thies</option>
+                        <option value="Saint-Louis">Saint-Louis</option>
+                        <option value="Ziguinchor">Ziguinchor</option>
+                        <option value="Tambacounda">Tambacounda</option>
+                        <option value="Kaolack">Kaolack</option>
+                        <option value="Diourbel">Diourbel</option>
+                        <option value="Fatick">Fatick</option>
+                        <option value="Kolda">Kolda</option>
+                        <option value="Matam">Matam</option>
+                    </select>
+                </div>
+
+                <!-- Bouton -->
+                <button onclick="diagnostiquer()" id="btn-diag"
+                    class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+                    Diagnostiquer
+                </button>
+            </div>
+
+            <!-- Colonne droite : resultat -->
+            <div id="result-section">
+                <div class="bg-white rounded-xl shadow-md p-6 text-center text-gray-400">
+                    <p class="text-4xl mb-3">&#129658;</p>
+                    <p class="font-medium">Remplissez le formulaire</p>
+                    <p class="text-sm mt-1">puis cliquez sur Diagnostiquer</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-400 text-sm py-4">
+        SenSante v0.3 - ESP/UCAD - DUT 2 INFO 2026
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        const API_URL = "http://localhost:8000";
+
+        async function diagnostiquer() {
+            // 1. Recuperer les valeurs du formulaire
+            const patient = {
+                age        : parseInt(document.getElementById("age").value),
+                sexe       : document.getElementById("sexe").value,
+                temperature: parseFloat(document.getElementById("temperature").value),
+                tension_sys: parseInt(document.getElementById("tension_sys").value),
+                toux       : document.getElementById("toux").checked,
+                fatigue    : document.getElementById("fatigue").checked,
+                maux_tete  : document.getElementById("maux_tete").checked,
+                region     : document.getElementById("region").value
+            };
+
+            // 2. Verifier les champs obligatoires
+            if (!patient.age || !patient.temperature || !patient.tension_sys) {
+                afficherErreur("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            // 3. Afficher le spinner de chargement
+            afficherChargement();
+
+            try {
+                // 4. Envoyer la requete a l'API
+                const response = await fetch(API_URL + "/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(patient)
+                });
+
+                // 5. Verifier la reponse
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(
+                        err.detail
+                            ? JSON.stringify(err.detail)
+                            : "Erreur serveur"
+                    );
+                }
+
+                // 6. Lire le resultat
+                const resultat = await response.json();
+
+                // 7. Afficher le resultat
+                afficherResultat(resultat);
+
+            } catch (error) {
+                afficherErreur("Erreur de connexion : " + error.message);
+            }
+        }
+
+        function afficherChargement() {
+            const section = document.getElementById("result-section");
+            section.innerHTML = `
+                <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p class="text-gray-500">Analyse en cours...</p>
+                </div>`;
+        }
+
+        function afficherResultat(r) {
+            // Codes couleur par diagnostic
+            const couleurs = {
+                palu  : { bg: "bg-red-100",    text: "text-red-800",    bar: "bg-red-500",    badge: "bg-red-500"    },
+                grippe: { bg: "bg-orange-100", text: "text-orange-800", bar: "bg-orange-500", badge: "bg-orange-500" },
+                typh  : { bg: "bg-yellow-100", text: "text-yellow-800", bar: "bg-yellow-500", badge: "bg-yellow-500" },
+                sain  : { bg: "bg-green-100",  text: "text-green-800",  bar: "bg-green-500",  badge: "bg-green-500"  }
+            };
+
+            const c   = couleurs[r.diagnostic] || couleurs["sain"];
+            const pct = Math.round(r.probabilite * 100);
+            const section = document.getElementById("result-section");
+
+            section.innerHTML = `
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Resultat</h2>
+
+                    <div class="${c.bg} rounded-lg p-4 mb-4">
+                        <p class="text-sm text-gray-600">Diagnostic :</p>
+                        <p class="text-2xl font-bold ${c.text} uppercase mt-1">${r.diagnostic}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Probabilite</span>
+                            <span class="text-sm font-bold ${c.text}">${pct}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="${c.bar} h-3 rounded-full transition-all duration-500"
+                                 style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="${c.badge} text-white text-xs px-2 py-1 rounded-full">${r.confiance}</span>
+                        <span class="text-sm text-gray-600">confiance</span>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <p class="text-sm text-gray-700">${r.message}</p>
+                    </div>
+                </div>`;
+        }
+
+        function afficherErreur(msg) {
+            const section = document.getElementById("result-section");
+            section.innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+                    <p class="text-red-700 font-medium">${msg}</p>
+                    <p class="text-red-500 text-sm mt-2">Verifiez votre connexion et reessayez.</p>
+                </div>`;
+        }
+    </script>
+
+</body>
+</html>

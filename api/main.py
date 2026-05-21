@@ -1,12 +1,16 @@
 # api/main.py
 # API FastAPI pour SenSante - Assistant pre-diagnostic medical
 # Lab 3 - Integration de Modeles IA - ESP / UCAD
+
 from pydantic import BaseModel, Field
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import numpy as np
 
+
 # --- Schemas Pydantic ---
+
 class PatientInput(BaseModel):
     """Donnees d'entree : les symptomes d'un patient."""
     age         : int   = Field(..., ge=0,    le=120,  description="Age en annees")
@@ -27,19 +31,33 @@ class DiagnosticOutput(BaseModel):
     message     : str   = Field(..., description="Recommandation")
 
 
-# Creer l'application
+# --- Creer l'application ---
+
 app = FastAPI(
     title="SenSante API",
     description="Assistant pre-diagnostic medical pour le Senegal",
     version="0.2.0"
 )
 
+# --- Autoriser les requetes depuis le frontend ---  ← CORRIGE : au niveau module
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # En dev : tout accepter
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 # --- Charger le modele et les encodeurs au demarrage ---
+
 print("Chargement du modele ...")
-model = joblib.load("models/model.pkl")
-le_sexe = joblib.load("models/encoder_sexe.pkl")
-le_region = joblib.load("models/encoder_region.pkl")
+model        = joblib.load("models/model.pkl")
+le_sexe      = joblib.load("models/encoder_sexe.pkl")
+le_region    = joblib.load("models/encoder_region.pkl")
 feature_cols = joblib.load("models/feature_cols.pkl")
+
 label_map = {
     0: "grippe",
     1: "palu",
@@ -50,14 +68,33 @@ label_map = {
 print(f"Modele charge : {type(model).__name__}")
 print(f"Classes : {[label_map[i] for i in model.classes_]}")
 
-# Route de base : verifier que l'API fonctionne
+
+# --- Route GET /health ---
+
 @app.get("/health")
 def health_check():
     """Verification de l'etat de l'API."""
     return {
-        "status": "ok",
-        "message": "SenSante API is running"
+        "status"  : "ok",
+        "message" : "SenSante API is running"
     }
+
+
+# --- Route GET /model-info ---
+
+@app.get("/model-info")
+def model_info():
+    """Informations sur le modele charge."""
+    return {
+        "type"         : type(model).__name__,
+        "n_arbres"     : model.n_estimators,
+        "classes"      : [label_map[i] for i in model.classes_],
+        "n_features"   : model.n_features_in_,
+        "feature_cols" : list(feature_cols)
+    }
+
+
+# --- Route POST /predict ---
 
 @app.post("/predict", response_model=DiagnosticOutput)
 def predict(patient: PatientInput):
@@ -98,7 +135,6 @@ def predict(patient: PatientInput):
         int(patient.maux_tete),
         region_enc
     ]])
-    
 
     # 3. Predire
     diagnostic = label_map[model.predict(features)[0]]
